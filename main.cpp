@@ -24,36 +24,25 @@ vector<string> getPowerSetStringVector(const string &order) {
 }
 
 vector<string> solution(vector<string> order_vec, vector<int> course_vec) {
-  map<string, int> count_map;
+  vector<map<string, int>> count_map_vec(11);
   for (string &order : order_vec) {
     sort(order.begin(), order.end());
-  }
-  for (string &order : order_vec) {
     for (string &sub_set_string : getPowerSetStringVector(order)) {
-      count_map[sub_set_string]++;
+      count_map_vec[sub_set_string.length()][sub_set_string]++;
     }
   }
-  for (auto iter = count_map.begin(); iter != count_map.end();) {
-    if (iter->second == 1) {
-      iter = count_map.erase(iter);
-    } else {
-      ++iter;
-    }
-  }
-  vector<vector<pair<int, string>>> count_vec_vec(11);
   vector<string> output_vec;
-  for (auto const&[key, value] : count_map) {
-    count_vec_vec[key.length()].push_back({value, key});
-  }
   for (int course : course_vec) {
-    if (!count_vec_vec[course].empty()) {
-      sort(count_vec_vec[course].begin(), count_vec_vec[course].end(), greater<>());
-      output_vec.push_back(count_vec_vec[course][0].second);
-      for (int i = 1; i < count_vec_vec[course].size(); ++i) {
-        if (count_vec_vec[course][i].first != count_vec_vec[course][0].first) {
-          break;
-        }
-        output_vec.push_back(count_vec_vec[course][i].second);
+    int max_value = 0;
+    for (auto const&[key, value] : count_map_vec[course]) {
+      max_value = max(max_value, value);
+    }
+    if (max_value < 2) {
+      continue;
+    }
+    for (auto const&[key, value] : count_map_vec[course]) {
+      if (value == max_value) {
+        output_vec.push_back(key);
       }
     }
   }
